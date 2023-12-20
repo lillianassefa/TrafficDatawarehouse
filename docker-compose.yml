@@ -1,0 +1,44 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_DB=traffic
+
+  airflow:
+    image: puckel/docker-airflow:latest
+    environment:
+      - LOAD_EX=n
+      - EXECUTOR=Celery
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_DB=traffic
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    volumes:
+      - ./dags:/usr/local/airflow/dags
+      - ./data:/data
+    
+    ports:
+      - "8080:8080"
+  
+  redis:
+    image: "redis:latest"
+    ports:
+      - "6379:6379"
+
+  # dbt:
+  #   image: dbtlabs/dbt:latest
+  #   volumes:
+  #     - ./dbt:/dbt
+    # environment:
+    #   - DBT_PROFILES_DIR=/dbt
+
+  # redash:
+  #   image: redash/redash:latest
+  #   environment:
+  #     - REDASH_DATABASE_URL=postgresql+psycopg2://myuser:mypassword@postgres/mydb
+  #   ports:
+  #     - "5000:5000"
